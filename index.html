@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urdu AI Numerology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/dayjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/plugin/advancedFormat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/plugin/utc.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/plugin/timezone.min.js"></script>
+    <script>dayjs.extend(dayjs.plugin.advancedFormat); dayjs.extend(dayjs.plugin.utc); dayjs.extend(dayjs.plugin.timezone);</script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; /* Default font */
+            background-color: #f0f9ff; /* Light blue background */
+            direction: ltr; /* Changed direction to Left-to-right for English */
+            text-align: left; /* Changed text alignment */
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0; /* Initial state for fade-in */
+            transform: translateY(20px); /* Initial state for slide-up */
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #0369a1; /* Darker blue */
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid #e0f2f7; /* Light blue border */
+            padding-bottom: 0.5rem;
+        }
+        .card-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fbbf24; /* Golden color */
+            text-align: center;
+            margin-top: 1rem;
+        }
+         /* Style for anti numbers if multiple */
+        .card-anti-numbers {
+            font-size: 1.5rem; /* Slightly smaller than main number */
+            font-weight: bold;
+            color: #dc2626; /* Red color for anti numbers */
+            text-align: center;
+            margin-top: 1rem;
+        }
+         /* Style for Anti/No Anti status */
+        .card-status {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .status-anti {
+             color: #dc2626; /* Red */
+        }
+         .status-no-anti {
+            color: #16a34a; /* Green */
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #075985; /* Even darker blue */
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #bae6fd; /* Light blue border */
+            border-radius: 0.5rem;
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+        button {
+            background-color: #0ea5e9; /* Sky blue */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0284c7; /* Darker sky blue on hover */
+        }
+        #reportSection {
+            margin-top: 2rem;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Losho Grid Styles */
+        .losho-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            grid-template-rows: repeat(3, 1fr); /* 3 rows */
+            gap: 5px; /* Space between cells */
+            width: 200px; /* Fixed size for the grid */
+            height: 200px; /* Fixed size for the grid */
+            margin: 20px auto; /* Center the grid */
+            border: 2px solid #0369a1; /* Border around the grid */
+            border-radius: 0.5rem; /* Rounded corners for the grid */
+            overflow: hidden; /* Hide overflow if cells are slightly larger */
+        }
+
+        .losho-grid-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e0f2f7; /* Light background for cells */
+            border: 1px solid #bae6fd; /* Border for cells */
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #075985; /* Dark blue text */
+             border-radius: 0.3rem; /* Slightly rounded corners for cells */
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Urdu AI Numerology Web App</h1>
+        <div class="card">
+            <div class="card-title">Enter Personal Information ✨</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="input-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" placeholder="Enter your name here">
+                </div>
+                <div class="input-group">
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob">
+                </div>
+                <div class="input-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                 <div class="input-group">
+                    <label for="mobile">Mobile Number:</label>
+                    <input type="text" id="mobile" placeholder="Enter your mobile number here">
+                </div>
+            </div>
+            <button id="calculateBtn" class="mt-6 w-full">Get Results 🎯</button>
+        </div>
+
+        <div id="reportSection" class="hidden">
+            <div class="card">
+                <div class="card-title">Your Numerology Report 📜</div>
+
+                <div class="card">
+                    <div class="card-title">Losho Grid 🟩</div>
+                     <div class="losho-grid-container">
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                        <div class="losho-grid-cell"></div>
+                    </div>
+                </div>
+
+                <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+
+                <button id="downloadPdfBtn" class="mt-6 w-full">Download Report as PDF 📥</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chaldean Numerology Mapping for Urdu/Arabic letters
+        // Note: This is a simplified mapping. Full Urdu/Arabic mapping can be complex.
+        // This includes common Urdu/Arabic letters and their Chaldean values.
+        const chaldeanMap = {
+            'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ھ': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
+            'ی': 1, 'ک': 2, 'ل': 3, 'م': 4, 'ن': 5, 'س': 6, 'ع': 7, 'ف': 8, 'ص': 9,
+            'ق': 1, 'ر': 2, 'ش': 3, 'ت': 4, 'ث': 5, 'خ': 6, 'ذ': 7, 'ض': 8, 'ظ': 9,
+            'غ': 1, 'پ': 2, 'چ': 3, 'ڑ': 4, 'گ': 3, 'ں': 5, 'ٹ': 9, 'ے': 1,
+            // Common English letters for names written in Roman Urdu sometimes
+            'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 8, 'G': 3, 'H': 5, 'I': 1, 'J': 1,
+            'K': 2, 'L': 3, 'M': 4, 'N': 5, 'O': 7, 'P': 8, 'Q': 1, 'R': 2, 'S': 3, 'T': 4,
+            'U': 6, 'V': 6, 'W': 6, 'X': 5, 'Y': 1, 'Z': 7,
+            'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 8, 'g': 3, 'h': 5, 'i': 1, 'j': 1,
+            'k': 2, 'l': 3, 'm': 4, 'n': 5, 'o': 7, 'p': 8, 'q': 1, 'r': 2, 's': 3, 't': 4,
+            'u': 6, 'v': 6, 'w': 6, 'x': 5, 'y': 1, 'z': 7
+        };
+
+        // Helper function to reduce a number to a single digit (1-9)
+        // This function now reduces ALL double digits.
+        function singleDigit(num) {
+            let sum = 0;
+            // Convert number to string to iterate over digits
+            String(num).split('').forEach(digit => {
+                sum += parseInt(digit);
+            });
+            // If the sum is still a double digit, recurse
+            if (sum > 9) {
+                return singleDigit(sum);
+            }
+            // Return the single digit
+            return sum;
+        }
+
+        // Calculate Driver Number
+        function calculateDriverNumber(dob) {
+            const day = dayjs(dob).date();
+            return singleDigit(day); // Uses singleDigit helper
+        }
+
+        // Calculate Conductor Number
+        function calculateConductorNumber(dob) {
+            const date = dayjs(dob);
+            const day = date.date();
+            const month = date.month() + 1; // Month is 0-indexed
+            const year = date.year();
+
+            let totalSum = 0;
+            String(day).split('').forEach(digit => totalSum += parseInt(digit));
+            String(month).split('').forEach(digit => totalSum += parseInt(digit));
+            String(year).split('').forEach(digit => totalSum += parseInt(digit));
+
+            // The singleDigit function ensures the totalSum is reduced to a single digit
+            return singleDigit(totalSum);
+        }
+
+        // Calculate Name Number (Chaldean)
+        function calculateNameNumber(name) {
+            let totalValue = 0;
+            // Remove spaces and convert to lowercase for consistent mapping
+            const cleanName = name.replace(/\s/g, '').toLowerCase();
+
+            for (let i = 0; i < cleanName.length; i++) {
+                const char = cleanName[i];
+                if (chaldeanMap[char]) {
+                    totalValue += chaldeanMap[char];
+                }
+                // Ignore characters not in the map
+            }
+            return singleDigit(totalValue); // Apply single digit reduction using helper
+        }
+
+        // Calculate Lucky Number
+        function calculateLuckyNumber(dob, gender) {
+            const currentYear = dayjs().year();
+            const yearSingleDigit = singleDigit(currentYear); // Uses singleDigit helper
+
+            let luckyNum;
+            if (gender === 'male') {
+                luckyNum = 11 - yearSingleDigit;
+            } else { // female
+                luckyNum = yearSingleDigit + 4;
+            }
+
+            return singleDigit(luckyNum); // Reduce to single digit if needed using helper
+        }
+
+        // Calculate Personal Year Number
+        function calculatePersonalYearNumber(dob) {
+            const date = dayjs(dob);
+            const birthdayMonth = date.month() + 1; // Month is 0-indexed
+            const birthdayDay = date.date();
+            const currentYear = dayjs().year();
+
+            let totalSum = 0;
+            String(birthdayDay).split('').forEach(digit => totalSum += parseInt(digit));
+            String(birthdayMonth).split('').forEach(digit => totalSum += parseInt(digit));
+            String(currentYear).split('').forEach(digit => totalSum += parseInt(digit));
+
+            return singleDigit(totalSum); // Uses singleDigit helper
+        }
+
+        // Calculate Current Age
+        function calculateCurrentAge(dob) {
+            const today = dayjs();
+            const birthDate = dayjs(dob);
+            // Calculate difference in years
+            const age = today.diff(birthDate, 'year');
+            return age;
+        }
+
+        // Calculate Mobile Number Numerology
+        function calculateMobileNumber(mobile) {
+             // Remove any non-digit characters from the mobile number
+            const cleanMobile = mobile.replace(/\D/g, '');
+            let totalSum = 0;
+            String(cleanMobile).split('').forEach(digit => {
+                totalSum += parseInt(digit);
+            });
+            return singleDigit(totalSum); // Reduce to single digit
+        }
+
+        // Mapping for Anti Numbers (Same for Driver, Conductor, and Name based on user input)
+        const antiNumberMapping = {
+            1: [8],
+            2: [4, 6, 8, 9],
+            3: [6],
+            4: [9, 2],
+            5: [3],
+            6: [3, 9],
+            7: [9],
+            8: [1, 2, 9],
+            9: [2, 4, 6]
+        };
+
+        // Calculate Driver Anti Number based on the provided mapping
+        function calculateDriverAntiNumber(driverNum) {
+            const antiNumbers = antiNumberMapping[driverNum];
+            if (antiNumbers) {
+                return antiNumbers.join(', ');
+            }
+            return "N/A";
+        }
+
+        // Calculate Conductor Anti Number based on the provided mapping
+        function calculateConductorAntiNumber(conductorNum) {
+             const antiNumbers = antiNumberMapping[conductorNum];
+            if (antiNumbers) {
+                return antiNumbers.join(', ');
+            }
+            return "N/A";
+        }
+
+         // Calculate Name Anti Number based on the provided mapping
+        function calculateNameAntiNumber(nameNum) {
+             const antiNumbers = antiNumberMapping[nameNum];
+            if (antiNumbers) {
+                return antiNumbers.join(', ');
+            }
+            return "N/A";
+        }
+
+         // Calculate Lucky Anti Number based on the provided mapping
+        function calculateLuckyAntiNumber(luckyNum) {
+             const antiNumbers = antiNumberMapping[luckyNum];
+            if (antiNumbers) {
+                return antiNumbers.join(', ');
+            }
+            return "N/A";
+        }
+
+        // Calculate Personal Year Anti Number based on the provided mapping
+        function calculatePersonalYearAntiNumber(personalYearNum) {
+             const antiNumbers = antiNumberMapping[personalYearNum];
+            if (antiNumbers) {
+                return antiNumbers.join(', ');
+            }
+            return "N/A";
+        }
+
+        // Calculate Universal Year Number
+        function calculateUniversalYear() {
+            const currentYear = dayjs().year();
+            return singleDigit(currentYear); // Sum digits of current year and reduce to single digit
+        }
+
+        // Check if Driver Number and Conductor Number are Anti based on Driver Anti Mapping
+        function checkDriverConductorAnti(driverNum, conductorNum) {
+            // Get the anti numbers for the driver number
+            const driverAntiNumbers = antiNumberMapping[driverNum];
+
+            // If driverAntiNumbers exist and the conductorNum is in that list
+            if (driverAntiNumbers && driverAntiNumbers.includes(conductorNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+         // Check if Driver Number and Name Number are Anti based on Driver Anti Mapping
+        function checkDriverNameAnti(driverNum, nameNum) {
+            // Get the anti numbers for the driver number
+            const driverAntiNumbers = antiNumberMapping[driverNum];
+
+            // If driverAntiNumbers exist and the nameNum is in that list
+            if (driverAntiNumbers && driverAntiNumbers.includes(nameNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+        // Check if Conductor Number and Name Number are Anti based on Conductor Anti Mapping
+        function checkConductorNameAnti(conductorNum, nameNum) {
+             // Get the anti numbers for the conductor number
+            const conductorAntiNumbers = antiNumberMapping[conductorNum];
+
+            // If conductorAntiNumbers exist and the nameNum is in that list
+            if (conductorAntiNumbers && conductorAntiNumbers.includes(nameNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+         // Check if Personal Year Number and Driver Number are Anti based on Driver Anti Mapping
+        function checkPersonalYearDriverAnti(personalYearNum, driverNum) {
+             // Get the anti numbers for the driver number
+            const driverAntiNumbers = antiNumberMapping[driverNum];
+
+            // If driverAntiNumbers exist and the personalYearNum is in that list
+            if (driverAntiNumbers && driverAntiNumbers.includes(personalYearNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+         // Check if Personal Year Number and Conductor Number are Anti based on Conductor Anti Mapping
+        function checkPersonalYearConductorAnti(personalYearNum, conductorNum) {
+             // Get the anti numbers for the conductor number
+            const conductorAntiNumbers = antiNumberMapping[conductorNum];
+
+            // If conductorAntiNumbers exist and the personalYearNum is in that list
+            if (conductorAntiNumbers && conductorAntiNumbers.includes(personalYearNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+        // Check if Universal Year Number and Driver Number are Anti based on Driver Anti Mapping
+        function checkUniversalYearDriverAnti(universalYearNum, driverNum) {
+             // Get the anti numbers for the driver number
+            const driverAntiNumbers = antiNumberMapping[driverNum];
+
+            // If driverAntiNumbers exist and the universalYearNum is in that list
+            if (driverAntiNumbers && driverAntiNumbers.includes(universalYearNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+        // Check if Universal Year Number and Conductor Number are Anti based on Conductor Anti Mapping
+        function checkUniversalYearConductorAnti(universalYearNum, conductorNum) {
+             // Get the anti numbers for the conductor number
+            const conductorAntiNumbers = antiNumberMapping[conductorNum];
+
+            // If conductorAntiNumbers exist and the universalYearNum is in that list
+            if (conductorAntiNumbers && conductorAntiNumbers.includes(universalYearNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+         // Check if Mobile Number and Driver Number are Anti based on Driver Anti Mapping
+        function checkMobileDriverAnti(mobileNum, driverNum) {
+             // Get the anti numbers for the driver number
+            const driverAntiNumbers = antiNumberMapping[driverNum];
+
+            // If driverAntiNumbers exist and the mobileNum is in that list
+            if (driverAntiNumbers && driverAntiNumbers.includes(mobileNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+        // Check if Mobile Number and Conductor Number are Anti based on Conductor Anti Mapping
+        function checkMobileConductorAnti(mobileNum, conductorNum) {
+             // Get the anti numbers for the conductor number
+            const conductorAntiNumbers = antiNumberMapping[conductorNum];
+
+            // If conductorAntiNumbers exist and the mobileNum is in that list
+            if (conductorAntiNumbers && conductorAntiNumbers.includes(mobileNum)) {
+                return "Anti";
+            } else {
+                return "No Anti";
+            }
+        }
+
+
+        // Display results in the HTML
+        function generateReport(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            const resultOrder = [
+                { key: 'driverNumber', title: 'Driver Number ✨' }, // Changed title
+                { key: 'driverAntiNumber', title: 'Driver Anti Number 🚫' },
+                { key: 'conductorNumber', title: 'Conductor Number 🎯' }, // Changed title
+                { key: 'conductorAntiNumber', title: 'Conductor Anti Number ❌' },
+                { key: 'driverConductorAnti', title: 'Driver-Conductor Anti ☯️' },
+                { key: 'nameNumber', title: 'Name Number (Chaldean) 📜' }, // Changed title
+                 { key: 'nameAntiNumber', title: 'Anti Name Number 📛' },
+                 { key: 'driverNameAnti', title: 'Driver and Name Anti 🤝' },
+                 { key: 'conductorNameAnti', title: 'Conductor and Name Anti 🔗' },
+                { key: 'luckyNumber', title: 'Lucky Number 🍀' }, // Changed title
+                 { key: 'luckyAntiNumber', title: 'Anti Lucky Number 💔' },
+                 { key: 'personalYearNumber', title: 'Personal Year Number 🗓️' }, // Changed title
+                 { key: 'personalYearAntiNumber', title: 'Anti Personal Year Number ⛔' },
+                 { key: 'personalYearDriverAnti', title: 'Personal Year and Driver Anti 🔄' },
+                 { key: 'personalYearConductorAnti', title: 'Personal Year and Conductor Anti ⚡' },
+                 { key: 'universalYear', title: 'Universal Year 🌍' },
+                 { key: 'universalYearDriverAnti', title: 'Universal Year and Driver Anti 🪐' },
+                 { key: 'universalYearConductorAnti', title: 'Universal Year and Conductor Anti 🌌' },
+                 { key: 'mobileNumber', title: 'Mobile Number Numerology 📱' }, // Changed title
+                 { key: 'mobileDriverAnti', title: 'Mobile and Driver Anti 📱🚫' },
+                 { key: 'mobileConductorAnti', title: 'Mobile and Conductor Anti 📱❌' },
+                { key: 'combination', title: 'Combination 🤝' },
+                { key: 'currentAge', title: 'Current Age 🎂' } // Changed title
+            ];
+
+            resultOrder.forEach((item, index) => {
+                const value = results[item.key];
+                 // Determine the CSS class based on the key
+                let numberClass = 'card-number';
+                if (item.key.includes('Anti') && !item.key.includes('driverConductorAnti') && !item.key.includes('driverNameAnti') && !item.key.includes('conductorNameAnti') && !item.key.includes('personalYearDriverAnti') && !item.key.includes('personalYearConductorAnti') && !item.key.includes('universalYearDriverAnti') && !item.key.includes('universalYearConductorAnti') && !item.key.includes('mobileDriverAnti') && !item.key.includes('mobileConductorAnti')) {
+                    numberClass = 'card-anti-numbers';
+                } else if (item.key.includes('Anti')) { // Catches all the Anti status checks
+                     numberClass = 'card-status ' + (value === 'Anti' ? 'status-anti' : 'status-no-anti');
+                }
+
+
+                const cardHtml = `
+                    <div class="card" style="animation-delay: ${index * 0.1}s;">
+                        <div class="card-title">${item.title}</div>
+                        <div class="${numberClass}">${value}</div>
+                    </div>
+                `;
+                resultsContainer.innerHTML += cardHtml;
+            });
+
+            document.getElementById('reportSection').classList.remove('hidden');
+        }
+
+        // Generate and download PDF report
+        function generatePdf(name, dob, gender, mobile, results) {
+            // Use window.jsPDF for jsPDF instance
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: 'a4'
+            });
+
+            // Set font for Urdu (requires a font that supports Urdu characters)
+            // You might need to add a font file and embed it for proper rendering.
+            // For simplicity, using a standard font here, Urdu might not render correctly without font embedding.
+            // doc.setFont("helvetica"); // Using a standard font, replace with Urdu font if available
+            // For English, standard fonts work fine
+             doc.setFont("helvetica");
+
+
+            doc.setR2L(false); // Set left-to-right mode for English PDF
+            doc.setFontSize(20);
+            doc.text("Your Numerology Report", doc.internal.pageSize.getWidth() / 2, 50, { align: "center" }); // Changed heading
+
+            doc.setFontSize(12);
+            doc.text(`Name: ${name}`, 50, 90); // Changed label
+            doc.text(`Date of Birth: ${dob}`, 50, 110); // Changed label
+            doc.text(`Gender: ${gender === 'male' ? 'Male' : 'Female'}`, 50, 130); // Changed label and options
+            doc.text(`Mobile Number: ${mobile}`, 50, 150); // Changed label
+
+            let yPos = 180; // Adjusted starting Y position
+
+            const resultOrder = [
+                { key: 'driverNumber', title: 'Driver Number' }, // Changed title
+                { key: 'driverAntiNumber', title: 'Driver Anti Number' },
+                { key: 'conductorNumber', title: 'Conductor Number' }, // Changed title
+                { key: 'conductorAntiNumber', title: 'Conductor Anti Number' },
+                { key: 'driverConductorAnti', title: 'Driver-Conductor Anti' },
+                { key: 'nameNumber', title: 'Name Number (Chaldean)' }, // Changed title
+                { key: 'nameAntiNumber', title: 'Anti Name Number' },
+                { key: 'driverNameAnti', title: 'Driver and Name Anti' },
+                { key: 'conductorNameAnti', title: 'Conductor and Name Anti' },
+                { key: 'luckyNumber', title: 'Lucky Number' }, // Changed title
+                { key: 'luckyAntiNumber', title: 'Anti Lucky Number' },
+                 { key: 'personalYearNumber', title: 'Personal Year Number' }, // Changed title
+                 { key: 'personalYearAntiNumber', title: 'Anti Personal Year Number' },
+                 { key: 'personalYearDriverAnti', title: 'Personal Year and Driver Anti' },
+                 { key: 'personalYearConductorAnti', title: 'Personal Year and Conductor Anti' },
+                 { key: 'universalYear', title: 'Universal Year' }, // Changed title
+                 { key: 'universalYearDriverAnti', title: 'Universal Year and Driver Anti' },
+                 { key: 'universalYearConductorAnti', title: 'Universal Year and Conductor Anti' },
+                 { key: 'mobileNumber', title: 'Mobile Number Numerology' }, // Changed title
+                 { key: 'mobileDriverAnti', title: 'Mobile and Driver Anti' },
+                 { key: 'mobileConductorAnti', title: 'Mobile and Conductor Anti' },
+                { key: 'combination', title: 'Combination' },
+                { key: 'currentAge', title: 'Current Age' } // Changed title
+            ];
+
+            // Add Losho Grid title to PDF
+            doc.setFontSize(14);
+            doc.text("Losho Grid:", 50, yPos); // Changed title
+            yPos += 30; // Add space after title
+
+             // Note: Visual representation of the Losho Grid is not added to the PDF
+             // as it requires more complex drawing logic in jsPDF. Only the title is included.
+
+
+            resultOrder.forEach(item => {
+                doc.setFontSize(14);
+                doc.text(`${item.title}:`, 50, yPos);
+                doc.setFontSize(12);
+                doc.text(String(results[item.key]), 250, yPos); // Adjusted X position for English text
+                yPos += 30;
+            });
+
+            // Add footer
+            doc.setFontSize(10);
+            doc.text("Generated with Urdu AI", doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 30, { align: "center" }); // Changed footer text
+
+
+            // Save the PDF
+            doc.save(`${name}_Numerology_Report.pdf`);
+        }
+
+        // Event Listener for Calculate Button
+        document.getElementById('calculateBtn').addEventListener('click', () => {
+            const name = document.getElementById('name').value;
+            const dob = document.getElementById('dob').value;
+            const gender = document.getElementById('gender').value;
+            const mobile = document.getElementById('mobile').value;
+
+            if (!name || !dob || !mobile) {
+                alert("Please enter Name, Date of Birth, and Mobile Number."); // Changed alert message
+                return;
+            }
+
+            try {
+                const driverNum = calculateDriverNumber(dob);
+                const conductorNum = calculateConductorNumber(dob);
+                const nameNum = calculateNameNumber(name);
+                const luckyNum = calculateLuckyNumber(dob, gender);
+                const personalYearNum = calculatePersonalYearNumber(dob);
+                const universalYearNum = calculateUniversalYear();
+                const mobileNum = calculateMobileNumber(mobile);
+
+
+                // Calculate Anti Numbers
+                const driverAntiNum = calculateDriverAntiNumber(driverNum);
+                const conductorAntiNum = calculateConductorAntiNumber(conductorNum);
+                const nameAntiNum = calculateNameAntiNumber(nameNum);
+                const luckyAntiNum = calculateLuckyAntiNumber(luckyNum);
+                const personalYearAntiNum = calculatePersonalYearAntiNumber(personalYearNum);
+
+                // Check Anti statuses
+                const driverConductorAntiStatus = checkDriverConductorAnti(driverNum, conductorNum);
+                const driverNameAntiStatus = checkDriverNameAnti(driverNum, nameNum);
+                const conductorNameAntiStatus = checkConductorNameAnti(conductorNum, nameNum);
+                const personalYearDriverAntiStatus = checkPersonalYearDriverAnti(personalYearNum, driverNum);
+                const personalYearConductorAntiStatus = checkPersonalYearConductorAnti(personalYearNum, conductorNum);
+                const universalYearDriverAntiStatus = checkUniversalYearDriverAnti(universalYearNum, driverNum);
+                const universalYearConductorAntiStatus = checkUniversalYearConductorAnti(universalYearNum, conductorNum);
+                const mobileDriverAntiStatus = checkMobileDriverAnti(mobileNum, driverNum);
+                const mobileConductorAntiStatus = checkMobileConductorAnti(mobileNum, conductorNum);
+
+
+                const results = {
+                    driverNumber: driverNum,
+                    driverAntiNumber: driverAntiNum,
+                    conductorNumber: conductorNum,
+                    conductorAntiNumber: conductorAntiNum,
+                    driverConductorAnti: driverConductorAntiStatus,
+                    nameNumber: nameNum,
+                    nameAntiNumber: nameAntiNum,
+                    driverNameAnti: driverNameAntiStatus,
+                    conductorNameAnti: conductorNameAntiStatus,
+                    luckyNumber: luckyNum,
+                    luckyAntiNumber: luckyAntiNum,
+                    personalYearNumber: personalYearNum,
+                    personalYearAntiNumber: personalYearAntiNum,
+                    personalYearDriverAnti: personalYearDriverAntiStatus,
+                    personalYearConductorAnti: personalYearConductorAntiStatus,
+                    universalYear: universalYearNum,
+                    universalYearDriverAnti: universalYearDriverAntiStatus,
+                    universalYearConductorAnti: universalYearConductorAntiStatus,
+                    mobileNumber: mobileNum,
+                    mobileDriverAnti: mobileDriverAntiStatus,
+                    mobileConductorAnti: mobileConductorAntiStatus,
+                    combination: `${conductorNum} & ${driverNum}`,
+                    currentAge: calculateCurrentAge(dob)
+                };
+
+                generateReport(results);
+
+                // Store results and input for PDF generation
+                document.getElementById('reportSection').dataset.name = name;
+                document.getElementById('reportSection').dataset.dob = dob;
+                document.getElementById('reportSection').dataset.gender = gender;
+                document.getElementById('reportSection').dataset.mobile = mobile;
+                document.getElementById('reportSection').dataset.results = JSON.stringify(results);
+
+            } catch (error) {
+                console.error("Calculation Error:", error);
+                alert("An error occurred during calculation. Please check the information again."); // Changed alert message
+            }
+        });
+
+        // Event Listener for Download PDF Button
+        document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+            const reportSection = document.getElementById('reportSection');
+            const name = reportSection.dataset.name;
+            const dob = reportSection.dataset.dob;
+            const gender = reportSection.dataset.gender;
+            const mobile = reportSection.dataset.mobile;
+            const results = JSON.parse(reportSection.dataset.results);
+
+            if (name && dob && gender && mobile && results) {
+                 // Format DOB for PDF if needed
+                const formattedDob = dayjs(dob).format('DD-MM-YYYY'); // Changed format here
+
+                generatePdf(name, formattedDob, gender, mobile, results);
+            } else {
+                alert("Please get the results first."); // Changed alert message
+            }
+        });
+
+    </script>
+</body>
+</html>
